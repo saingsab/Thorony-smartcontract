@@ -37,7 +37,6 @@ contract IndoorComposeNFT is ERC1155, Ownable, Pausable, ERC1155Burnable, ERC115
         );
     }
 
-    // Will chang to dynami ID next version
     function mint(uint256 amount)
         public
         payable
