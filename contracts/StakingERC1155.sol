@@ -12,26 +12,26 @@ interface IERC20 {
 }
 
 contract StakingERC1155 is ERC1155Holder, Ownable{
-    IERC1155 public token;
+    IERC1155 public nftToken;
     IERC20 public rewardToken;
     mapping(uint256 => address) public tokenOwnerOf; // who's the owner of each tokenId
     mapping(uint256 => uint256) public tokenStakedAtTime; // time at which token was staked
     mapping(uint256 => uint256) public tokenAmountStaked; // how much amount of each tokenId is staked
 
-    constructor(address _token, address _rewordToken) {
-        token = IERC1155(_token);
+    constructor(address _nftToken, address _rewordToken) {
+        nftToken = IERC1155(_nftToken);
         rewardToken = IERC20(_rewordToken);
     }
 
     function stakeNFT(uint tokenId, uint amount) external{
-        token.safeTransferFrom(msg.sender, address(this), tokenId, amount, "0x"); // from, to, id, amount, data
+        nftToken.safeTransferFrom(msg.sender, address(this), tokenId, amount, "0x"); // from, to, id, amount, data
         tokenOwnerOf[tokenId] = msg.sender;
         tokenStakedAtTime[tokenId] = block.timestamp;
         tokenAmountStaked[tokenId] = amount;
     }
 
     function stakeBatchNFT(uint[] memory tokenId, uint[] memory amount) external{
-        token.safeBatchTransferFrom(msg.sender, address(this), tokenId, amount, "0x"); // from, to, id, amount, data
+        nftToken.safeBatchTransferFrom(msg.sender, address(this), tokenId, amount, "0x"); // from, to, id, amount, data
         for(uint i = 0; i < tokenId.length; i++)
         {
             tokenOwnerOf[tokenId[i]] = msg.sender;
@@ -47,7 +47,7 @@ contract StakingERC1155 is ERC1155Holder, Ownable{
        //transfer(address recipient, uint amount) external returns (bool);
         IERC20 _rewardToken = IERC20(rewardToken);
         _rewardToken.transfer(msg.sender, calculateTokens(tokenId)); // transferFrom(address(this), msg.sender, calculateTokens(tokenId));
-        token.safeTransferFrom(address(this), msg.sender, tokenId, amount, "0x");
+        nftToken.safeTransferFrom(address(this), msg.sender, tokenId, amount, "0x");
         delete tokenOwnerOf[tokenId];
         delete tokenStakedAtTime[tokenId];
     }
@@ -57,7 +57,7 @@ contract StakingERC1155 is ERC1155Holder, Ownable{
         {
             require(tokenOwnerOf[tokenId[i]] == msg.sender);
         }
-        token.safeBatchTransferFrom(address(this), msg.sender, tokenId, amount, "0x");
+        nftToken.safeBatchTransferFrom(address(this), msg.sender, tokenId, amount, "0x");
         for(uint i = 0; i < tokenId.length; i++)
         {
            // _mint(msg.sender, calculateTokens(tokenId[i]));
